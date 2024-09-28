@@ -1,14 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms'
+	import { RegisterForm } from '$components/auth'
+	import type { PageData } from './$types'
+
+	export let data: PageData
 </script>
 
-<h1>Sign up</h1>
-<form method="post" use:enhance>
-	<label for="name">Name</label>
-	<input name="name" id="name" /><br />
-	<label for="email">Email</label>
-	<input name="email" id="email" /><br />
-	<label for="password">Password</label>
-	<input type="password" name="password" id="password" /><br />
-	<button>Continue</button>
-</form>
+<RegisterForm data={data.form} />

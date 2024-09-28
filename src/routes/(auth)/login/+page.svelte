@@ -1,12 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms'
+	import { LoginForm } from '$components/auth'
+	import type { PageData } from './$types'
+
+	export let data: PageData
 </script>
 
-<h1>Sign in</h1>
-<form method="post" use:enhance>
-	<label for="email">Email</label>
-	<input name="email" id="email" /><br />
-	<label for="password">Password</label>
-	<input type="password" name="password" id="password" /><br />
-	<button>Continue</button>
-</form>
+<LoginForm data={data.form} />

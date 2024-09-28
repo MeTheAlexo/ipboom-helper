@@ -17,6 +17,6 @@
 	<Button on:click={logout}>Logout</Button>
 {/if}
 
-<main>
+<main class="px-6 py-4">
 	<slot />
 </main>
