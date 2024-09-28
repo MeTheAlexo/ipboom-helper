@@ -6,7 +6,9 @@ declare global {
 			user: import('lucia').User | null
 			session: import('lucia').Session | null
 		}
-		// interface PageData {}
+		interface PageData {
+			user: import('lucia').User | null
+		}
 		// interface PageState {}
 		// interface Platform {}
 	}
