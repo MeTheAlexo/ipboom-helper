@@ -1,0 +1,68 @@
+services:
+  watchtower:
+    image: containrrr/watchtower
+    command:
+      - '--label-enable'
+      - '--interval'
+      - '30'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  reverse-proxy:
+    image: traefik
+    command:
+      - '--providers.docker'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entryPoints.websecure.address=:443'
+      - '--certificatesresolvers.myresolver.acme.tlschallenge=true'
+      - '--certificatesresolvers.myresolver.acme.email=info@ipboom-helper.online'
+      - '--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json'
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
+      - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  ipboom-helper:
+    image: ghcr.io/methealexo/ipboom-helper:prod
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.ipboom-helper.rule=Host(`ipboom-helper.online`)'
+      - 'traefik.http.routers.ipboom-helper.entrypoints=websecure'
+      - 'traefik.http.routers.ipboom-helper.tls.certresolver=myresolver'
+      - 'com.centurylinklabs.watchtower.enable=true'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:helper@db/helper?schema=public&sslmode=disable
+    restart: always
+    command: >
+      sh -c "npm run db:deploy &&
+            node build"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=helper
+      - POSTGRES_PASSWORD=helper
+    expose:
+      - 5432
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+  letsencrypt:

@@ -6,7 +6,7 @@ services:
       - 3000:3000
     environment:
       - ORIGIN=http://localhost:3000
-      - DATABASE_URL=postgresql://postgres:postgres@db/postgres?schema=public
+      - DATABASE_URL=postgresql://postgres:postgres@db/postgres?schema=public&sslmode=disable
     command: >
       sh -c "npm run db:deploy &&
             node build"

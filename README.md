@@ -1,4 +1,11 @@
+## Build image local
+
 ```bash
-docker compose -f compose.dev.yaml up -d
-docker build --no-cache -t ghcr.io/methealexo/ipboom-helper .
+docker build -t ghcr.io/methealexo/ipboom-helper .
+```
+
+## For local dev
+
+```bash
+docker compose up -d
 ```
