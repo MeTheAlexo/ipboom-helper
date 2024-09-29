@@ -1,10 +1,36 @@
 services:
+  ipboom-helper:
+    image: ghcr.io/methealexo/ipboom-helper
+    container_name: ipboom-helper
+    ports:
+      - 3000:3000
+    environment:
+      - ORIGIN=http://localhost:3000
+      - DATABASE_URL=postgresql://postgres:postgres@db/postgres?schema=public
+    command: >
+      sh -c "npm run db:deploy &&
+            node build"
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:alpine
+    container_name: postgres
     restart: always
-    ports:
-      - 5432:5432
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    expose:
+      - 5432
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
